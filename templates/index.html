@@ -1,0 +1,680 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Weather | Simple & Accurate</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Orbitron:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6C63FF;
+      --secondary: #4A90E2;
+      --accent: #FF6584;
+      --dark: #0f172a;
+      --darker: #020617;
+      --light: #F8F9FA;
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-heavy: rgba(255, 255, 255, 0.1);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 50%, #1e1b4b 100%);
+      min-height: 100vh;
+      color: var(--light);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Animated Background Elements */
+    .bg-circle {
+      position: fixed;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
+      opacity: 0.15;
+      z-index: -1;
+      filter: blur(60px);
+      animation: float 20s infinite linear;
+    }
+
+    .bg-circle:nth-child(1) {
+      width: 600px;
+      height: 600px;
+      top: -10%;
+      left: -10%;
+      animation-delay: 0s;
+    }
+
+    .bg-circle:nth-child(2) {
+      width: 500px;
+      height: 500px;
+      bottom: -10%;
+      right: -10%;
+      animation-delay: -5s;
+      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    }
+
+    .bg-circle:nth-child(3) {
+      width: 400px;
+      height: 400px;
+      top: 40%;
+      left: 60%;
+      animation-delay: -10s;
+      background: radial-gradient(circle, var(--secondary) 0%, transparent 70%);
+    }
+
+    .weather-app {
+      min-height: 100vh;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      padding: 0 20px;
+    }
+
+    .app-branding {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .app-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 2.5rem;
+      color: white;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      letter-spacing: -1px;
+    }
+
+    .app-subtitle {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      letter-spacing: 1px;
+      margin-top: 5px;
+    }
+
+    .search-container {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .search-box {
+      display: flex;
+      gap: 15px;
+      background: var(--glass);
+      padding: 8px;
+      border-radius: 50px;
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .search-box:focus-within {
+      background: var(--glass-heavy);
+      border-color: var(--primary);
+      box-shadow: 0 0 20px rgba(108, 99, 255, 0.2);
+    }
+
+    .form-control {
+      background: transparent;
+      border: none;
+      padding: 12px 25px;
+      color: white;
+      font-weight: 500;
+      font-size: 1.1rem;
+    }
+
+    .form-control:focus {
+      background: transparent;
+      box-shadow: none;
+      color: white;
+    }
+
+    .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .btn-search {
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 50px;
+      padding: 12px 35px;
+      font-weight: 600;
+      color: white;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+      white-space: nowrap;
+    }
+
+    .btn-search:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(108, 99, 255, 0.5);
+    }
+
+    .weather-content {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.2fr 1.8fr;
+      gap: 40px;
+      padding: 0 20px;
+      align-items: center;
+    }
+
+    .weather-main-card {
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      border-radius: 30px;
+      padding: 50px;
+      border: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: var(--glass-shadow);
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+      justify-content: center;
+      min-height: 500px;
+    }
+
+    .weather-main-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+
+    .location-badge {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .city-name {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      line-height: 1.1;
+    }
+
+    .current-time {
+      font-size: 1.2rem;
+      opacity: 0.7;
+      margin-bottom: 40px;
+    }
+
+    .temp-container {
+      position: relative;
+      margin: 20px 0;
+    }
+
+    .temperature-display {
+      font-size: 8rem;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(180deg, #fff, rgba(255, 255, 255, 0.7));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.2));
+    }
+
+    .temperature-unit {
+      font-size: 3rem;
+      position: absolute;
+      top: 10px;
+      right: -40px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .weather-icon-large {
+      width: 200px;
+      height: 200px;
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .weather-desc {
+      font-size: 1.5rem;
+      text-transform: capitalize;
+      margin-top: 20px;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      height: 100%;
+    }
+
+    .stat-card {
+      background: var(--glass);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      padding: 25px;
+      border: 1px solid var(--glass-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-10px);
+      background: var(--glass-heavy);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 15px;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      opacity: 0.6;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .sun-card {
+      grid-column: span 3;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    }
+
+    .sun-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .sun-icon {
+      font-size: 2.5rem;
+      animation: pulse 3s infinite;
+    }
+
+    .sun-info h4 {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin: 0;
+      text-transform: uppercase;
+    }
+
+    .sun-info p {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .welcome-screen {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 60vh;
+      background: var(--glass);
+      border-radius: 30px;
+      border: 1px solid var(--glass-border);
+    }
+
+    .welcome-icon {
+      font-size: 5rem;
+      margin-bottom: 30px;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    /* Animations */
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-20px);
+      }
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .loader {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .weather-content {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+
+      .weather-main-card {
+        min-height: auto;
+        padding: 40px;
+      }
+
+      .weather-app {
+        height: auto;
+        min-height: 100vh;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .app-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+
+      .weather-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .sun-card {
+        grid-column: span 2;
+        flex-direction: column;
+        gap: 20px;
+        padding: 30px;
+      }
+
+      .temperature-display {
+        font-size: 5rem;
+      }
+
+      .city-name {
+        font-size: 2.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Background Elements -->
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+  <div class="bg-circle"></div>
+  <div id="particles-js" style="position: absolute; width: 100%; height: 100%; z-index: 0;"></div>
+
+  <div class="weather-app">
+    <header class="app-header animate__animated animate__fadeInDown">
+      <div class="app-branding">
+        <h1 class="app-title">Weather</h1>
+        <p class="app-subtitle">Simple & Accurate</p>
+      </div>
+
+      <div class="search-container">
+        <form method="POST" class="search-form">
+          <div class="search-box">
+            <input type="text" class="form-control" name="city" placeholder="Search city..." required
+              value="{{ request.form.city if request.form.city }}" autocomplete="off">
+            <button class="btn btn-search" type="submit" id="search-btn">
+              <span id="btn-text">Search</span>
+              <div id="btn-loading" class="loader d-none"></div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </header>
+
+    {% if weather %}
+    {% if weather.error %}
+    <div class="alert alert-danger animate__animated animate__shakeX mx-auto"
+      style="max-width: 500px; background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.5); color: white;">
+      <i class="fas fa-exclamation-triangle me-2"></i>{{ weather.error }}
+    </div>
+    {% else %}
+    <div class="weather-content animate__animated animate__fadeInUp">
+      <!-- Main Weather Card -->
+      <div class="weather-main-card">
+        <div class="location-badge">
+          <i class="fas fa-map-marker-alt me-2"></i> {{ weather.country }}
+        </div>
+        <h2 class="city-name">{{ weather.city }}</h2>
+        <div class="current-time">{{ weather.time }}</div>
+
+        <div class="weather-icon-container">
+          <img src="http://openweathermap.org/img/wn/{{ weather.icon }}@4x.png" alt="weather icon"
+            class="weather-icon-large">
+        </div>
+
+        <div class="temp-container">
+          <span class="temperature-display">{{ weather.temperature|round|int }}</span>
+          <span class="temperature-unit">°C</span>
+        </div>
+
+        <div class="weather-desc">{{ weather.description }}</div>
+      </div>
+
+      <!-- Detailed Stats Grid -->
+      <div class="weather-grid">
+        <div class="stat-card" style="animation-delay: 0.1s">
+          <div class="stat-icon" style="color: #4facfe;">
+            <i class="fas fa-wind"></i>
+          </div>
+          <div class="stat-value">{{ weather.wind_speed }} <span style="font-size: 1rem">m/s</span></div>
+          <div class="stat-label">Wind Speed</div>
+        </div>
+
+        <div class="stat-card" style="animation-delay: 0.2s">
+          <div class="stat-icon" style="color: #00f260;">
+            <i class="fas fa-tint"></i>
+          </div>
+          <div class="stat-value">{{ weather.humidity }}<span style="font-size: 1rem">%</span></div>
+          <div class="stat-label">Humidity</div>
+        </div>
+
+        <div class="stat-card" style="animation-delay: 0.3s">
+          <div class="stat-icon" style="color: #ff9a9e;">
+            <i class="fas fa-thermometer-half"></i>
+          </div>
+          <div class="stat-value">{{ weather.feels_like|round|int }}°</div>
+          <div class="stat-label">Feels Like</div>
+        </div>
+
+        <div class="stat-card" style="animation-delay: 0.4s">
+          <div class="stat-icon" style="color: #a18cd1;">
+            <i class="fas fa-eye"></i>
+          </div>
+          <div class="stat-value">{{ weather.visibility }} <span style="font-size: 1rem">km</span></div>
+          <div class="stat-label">Visibility</div>
+        </div>
+
+        <div class="stat-card" style="animation-delay: 0.5s">
+          <div class="stat-icon" style="color: #fbc2eb;">
+            <i class="fas fa-tachometer-alt"></i>
+          </div>
+          <div class="stat-value">{{ weather.pressure }} <span style="font-size: 1rem">hPa</span></div>
+          <div class="stat-label">Pressure</div>
+        </div>
+
+        <div class="stat-card" style="animation-delay: 0.6s">
+          <div class="stat-icon" style="color: #8fd3f4;">
+            <i class="fas fa-cloud"></i>
+          </div>
+          <div class="stat-value">{{ weather.description }}</div>
+          <div class="stat-label">Condition</div>
+        </div>
+
+        <div class="stat-card sun-card" style="animation-delay: 0.7s">
+          <div class="sun-item">
+            <div class="sun-icon" style="color: #ff9a9e;">
+              <i class="fas fa-sunrise"></i>
+            </div>
+            <div class="sun-info">
+              <h4>Sunrise</h4>
+              <p>{{ weather.sunrise }}</p>
+            </div>
+          </div>
+          <div style="width: 1px; height: 50px; background: rgba(255,255,255,0.1);"></div>
+          <div class="sun-item">
+            <div class="sun-icon" style="color: #f6d365;">
+              <i class="fas fa-sunset"></i>
+            </div>
+            <div class="sun-info">
+              <h4>Sunset</h4>
+              <p>{{ weather.sunset }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="welcome-screen animate__animated animate__fadeIn">
+      <div class="welcome-icon">
+        <i class="fas fa-cloud-sun-rain"
+          style="background: linear-gradient(45deg, var(--primary), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+      </div>
+      <h2 style="font-size: 2.5rem; margin-bottom: 15px;">Welcome to Weather</h2>
+      <p style="font-size: 1.2rem; opacity: 0.7; max-width: 600px;">
+        Experience weather tracking like never before. Enter a city name above to get real-time atmospheric data,
+        detailed analytics, and precise forecasts.
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Initialize particles
+      particlesJS('particles-js', {
+        particles: {
+          number: { value: 60, density: { enable: true, value_area: 800 } },
+          color: { value: "#ffffff" },
+          shape: { type: "circle" },
+          opacity: { value: 0.1, random: true },
+          size: { value: 3, random: true },
+          line_linked: {
+            enable: true,
+            distance: 150,
+            color: "#ffffff",
+            opacity: 0.05,
+            width: 1
+          },
+          move: {
+            enable: true,
+            speed: 1,
+            direction: "none",
+            random: true,
+            straight: false,
+            out_mode: "out",
+            bounce: false
+          }
+        },
+        interactivity: {
+          detect_on: "canvas",
+          events: {
+            onhover: { enable: true, mode: "grab" },
+            onclick: { enable: true, mode: "push" },
+            resize: true
+          },
+          modes: {
+            grab: { distance: 140, line_linked: { opacity: 0.1 } }
+          }
+        },
+        retina_detect: true
+      });
+
+      // Form submission handling
+      const form = document.querySelector('form');
+      if (form) {
+        form.addEventListener('submit', function () {
+          const btnText = document.getElementById('btn-text');
+          const btnLoading = document.getElementById('btn-loading');
+          const searchBtn = document.getElementById('search-btn');
+
+          btnText.style.display = 'none';
+          btnLoading.classList.remove('d-none');
+          searchBtn.disabled = true;
+          searchBtn.style.opacity = '0.8';
+        });
+      }
+    });
+  </script>
+</body>
+
+</html>
