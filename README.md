@@ -16,8 +16,8 @@ Weather is a sleek, full-screen Flask app delivering real-time updates and detai
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/weather-app.git
-    cd weather-app
+    git clonehttps://github.com/mohammed-aaqieb/Weather.git
+    cd Weather
     ```
 
 2.  Install dependencies:
@@ -45,3 +45,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is open source and available under the [MIT License](LICENSE).
+
